@@ -44,6 +44,9 @@ const config = {
       apiDate: process.env.API_DATE || 'X-API-Date',
       packageVersion: process.env.PACKAGE_VERSION || 'X-Package-Version',
       nodeVersion: process.env.NODE_VERSION || 'X-Node-Version'
+    },
+    external: {
+      quoteApiUrl: process.env.QUOTE_API_URL
     }
   }
 };
