@@ -48,6 +48,9 @@ const config = {
     external: {
       quoteApiUrl: process.env.QUOTE_API_URL
     }
+  },
+  constants: {
+    regexWoloxDomains: /@wolox(?:\.co|\.ar|\.com)$/
   }
 };
 
