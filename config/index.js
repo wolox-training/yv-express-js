@@ -50,7 +50,8 @@ const config = {
     }
   },
   constants: {
-    regexWoloxDomains: /@wolox(?:\.co|\.ar|\.com)$/
+    regexWoloxDomains: /@wolox(?:\.co|\.ar|\.com)$/,
+    roundsToEncryptHash: 10
   }
 };
 
