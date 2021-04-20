@@ -21,7 +21,7 @@ describe('=== TESTING POST:/users endpoint ===', () => {
       .post('/users')
       .send(mockUserSuccess)
       .then(response => {
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(201);
         expect(response.text).toBe(`User [${mockUserSuccess.name}] has been created succesfully`);
         done();
       });
