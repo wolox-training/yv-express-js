@@ -8,12 +8,11 @@ exports.signUp = async (req, res, next) => {
     const userCreated = await userServices.signUpUser(body);
 
     if (!userCreated && !userCreated.id) {
-      notFoundError('User not registered');
-      return false;
+      return notFoundError('User not registered');
     }
 
     logger.info(`User [${userCreated.name}] has been created succesfully`);
-    return res.status(200).send(`User [${userCreated.name}] has been created succesfully`);
+    return res.status(201).send(`User [${userCreated.name}] has been created succesfully`);
   } catch (error) {
     return next(error);
   }

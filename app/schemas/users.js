@@ -11,7 +11,7 @@ exports.signUpSchema = () => [
     .escape()
     .isEmpty()
     .withMessage('Name is required'),
-  body('last_name')
+  body('lastName')
     .not()
     .trim()
     .escape()
