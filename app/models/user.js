@@ -1,5 +1,4 @@
-const bcrypt = require('bcrypt');
-const { generateHash } = require('../helpers/encrypt');
+const { encryptPassword } = require('../helpers/encrypt');
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
@@ -18,9 +17,8 @@ module.exports = (sequelize, DataTypes) => {
 
   User.beforeSave(async user => {
     if (user.changed('password')) {
-      const salt = await generateHash();
       // eslint-disable-next-line require-atomic-updates
-      user.password = await bcrypt.hash(user.password, salt);
+      user.password = await encryptPassword(user.password);
     }
   });
   return User;

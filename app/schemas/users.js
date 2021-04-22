@@ -40,4 +40,17 @@ const signUpSchema = {
   }
 };
 
+const signInSchema = {
+  mail: {
+    ...standardBodyValidations,
+    ...validateIfIsEmptyField('Mail is required'),
+    matches: {
+      options: [regexWoloxDomains],
+      errorMessage: 'The mail domain is invalid'
+    }
+  },
+  password: signUpSchema.password
+};
+
 exports.validateSignUpSchema = [checkSchema(signUpSchema), schemaValidate];
+exports.validateSignInSchema = [checkSchema(signInSchema), schemaValidate];
