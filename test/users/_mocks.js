@@ -7,6 +7,11 @@ const body = {
   password: faker.internet.password(8)
 };
 
+const loginBody = {
+  mail: body.mail,
+  password: body.password
+};
+
 exports.mockUserSuccess = body;
 
 // Missing params
@@ -39,4 +44,27 @@ exports.mockUserWrongMailDomain = {
 exports.mockUserWrongPassword = {
   ...body,
   password: faker.internet.password(7)
+};
+
+// ##### Mocks to users/sessions endpoint
+exports.mockSignInSuccess = loginBody;
+
+exports.mockSignInMissingMail = {
+  ...loginBody,
+  mail: ''
+};
+
+exports.mockSignInMissingPassword = {
+  ...loginBody,
+  password: ''
+};
+
+exports.mockSignInWrongMail = {
+  ...loginBody,
+  mail: faker.internet.email(null, null, 'gmail.co')
+};
+
+exports.mockSignInWrongPassword = {
+  ...loginBody,
+  password: faker.internet.password(9)
 };
