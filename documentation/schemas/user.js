@@ -1,27 +1,63 @@
 module.exports = {
-  userId: {
+  id: {
     type: 'integer',
+    description: 'Unique and auto-increment user ID',
     example: 7
   },
-  username: {
+  name: {
     type: 'string',
+    description: 'User name',
     example: 'tom99'
   },
-  userEmail: {
+  lastName: {
     type: 'string',
-    example: 'tom.engels@wolox.com.ar'
+    description: 'User lastName',
+    example: 'thompson'
+  },
+  mail: {
+    type: 'string',
+    description: 'User email',
+    example: 'tom.thompson@wolox.co'
+  },
+  password: {
+    type: 'string',
+    description: 'User password',
+    example: 'MyPassword123'
+  },
+  NewUser: {
+    type: 'object',
+    properties: {
+      name: {
+        $ref: '#/components/schemas/name'
+      },
+      lastName: {
+        $ref: '#/components/schemas/lastName'
+      },
+      mail: {
+        $ref: '#/components/schemas/mail'
+      },
+      password: {
+        $ref: '#/components/schemas/password'
+      }
+    }
   },
   User: {
     type: 'object',
     properties: {
       id: {
-        $ref: '#/components/schemas/userId'
+        $ref: '#/components/schemas/id'
       },
-      username: {
-        $ref: '#/components/schemas/username'
+      name: {
+        $ref: '#/components/schemas/name'
       },
-      email: {
-        $ref: '#/components/schemas/userEmail'
+      lastName: {
+        $ref: '#/components/schemas/lastName'
+      },
+      mail: {
+        $ref: '#/components/schemas/mail'
+      },
+      password: {
+        $ref: '#/components/schemas/password'
       }
     }
   },
