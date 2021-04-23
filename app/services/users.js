@@ -44,3 +44,31 @@ exports.getUserByEmailAndPassword = async (mail, newPassword) => {
     return new Error(`getUserByEmailAndPassword Error => ${error.message}`);
   }
 };
+
+exports.getUsersList = async (options = {}) => {
+  try {
+    const returnOptions = {};
+    const conditions = {
+      ...options,
+      attributes: { exclude: ['password'] }
+    };
+
+    const users = await userModel.findAll(conditions);
+    const totalUsers = await userModel.count();
+
+    if (options.limit && options.offset) {
+      returnOptions.limit = options.limit;
+      returnOptions.offset = options.offset;
+    }
+
+    return {
+      users,
+      count: users.length,
+      totalUsers,
+      ...returnOptions
+    };
+  } catch (error) {
+    logger.error(`getUsersList Error => ${error}`);
+    return new Error(`getUsersList Error => ${error.message}`);
+  }
+};

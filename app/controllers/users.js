@@ -36,3 +36,24 @@ exports.signIn = async (req, res, next) => {
     return next(error);
   }
 };
+
+exports.getUsers = async (req, res, next) => {
+  try {
+    const queryParams = req.query;
+    const offset = queryParams && queryParams.offset ? queryParams.offset : '';
+
+    const options = {
+      limit: queryParams && queryParams.limit ? queryParams.limit : 10
+    };
+
+    if (offset) {
+      options.offset = offset;
+    }
+
+    const users = await userServices.getUsersList();
+
+    return res.status(200).json({ ...users });
+  } catch (error) {
+    return next(error);
+  }
+};
