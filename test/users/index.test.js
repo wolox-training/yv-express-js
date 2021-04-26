@@ -1,3 +1,4 @@
+/* eslint max-lines: ["error", {"max": 1000, "skipComments": true}] */
 const supertest = require('supertest');
 
 const app = require('../../app');
@@ -292,7 +293,7 @@ describe('=== TESTING GET:/users endpoint ===', () => {
     });
 
     test('---> The response body must be "Unauthorized access" error <---', () => {
-      // expect(response.body).toEqual(unauthorizedError('Unauthorized access'));
+      // test internalCode , response.body
       expect(response.body.message).toBe('Unauthorized access');
     });
   });
