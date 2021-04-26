@@ -1,49 +1,56 @@
-const { body } = require('express-validator');
-const { existUserMail } = require('../services/users');
+const { checkSchema } = require('express-validator');
+
 const config = require('../../config');
+const { schemaValidate } = require('../middlewares/schemaValidate');
 
 const { regexWoloxDomains } = config.constants;
+const {
+  standardBodyValidations,
+  validateIfIsEmptyField,
+  validateIfExistUserMail
+} = require('../mappers/commonSchemaValidations');
 
-exports.signUpSchema = () => [
-  body('name')
-    .not()
-    .trim()
-    .escape()
-    .isEmpty()
-    .withMessage('Name is required'),
-  body('lastName')
-    .not()
-    .trim()
-    .escape()
-    .isEmpty()
-    .withMessage('Lastname is required'),
-  body('mail')
-    .not()
-    .trim()
-    .escape()
-    .isEmpty()
-    .normalizeEmail()
-    .withMessage('Mail is required'),
-  body('mail')
-    .isEmail()
-    .withMessage('The mail format is invalid'),
-  body('mail')
-    .matches(regexWoloxDomains)
-    .withMessage('The mail domain is invalid'),
-  body('mail').custom(async newMail => {
-    const mailExist = await existUserMail(newMail);
-
-    if (mailExist) {
-      throw new Error('Email address already taken');
+const signUpSchema = {
+  name: {
+    ...standardBodyValidations,
+    ...validateIfIsEmptyField('Name is required')
+  },
+  lastName: {
+    ...standardBodyValidations,
+    ...validateIfIsEmptyField('Lastname is required')
+  },
+  mail: {
+    ...standardBodyValidations,
+    ...validateIfIsEmptyField('Mail is required'),
+    matches: {
+      options: [regexWoloxDomains],
+      errorMessage: 'The mail domain is invalid'
+    },
+    custom: {
+      options: validateIfExistUserMail
     }
-  }),
-  body('password')
-    .not()
-    .trim()
-    .escape()
-    .isEmpty()
-    .withMessage('Password is required'),
-  body('password')
-    .isLength({ min: 8 })
-    .withMessage('Password should be at least 8 chars long')
-];
+  },
+  password: {
+    ...standardBodyValidations,
+    ...validateIfIsEmptyField('Password is required'),
+    isLength: {
+      errorMessage: 'Password should be at least 8 chars long',
+      options: { min: 8 }
+    }
+  }
+};
+
+const signInSchema = {
+  mail: {
+    ...standardBodyValidations,
+    ...validateIfIsEmptyField('Mail is required'),
+    matches: {
+      options: [regexWoloxDomains],
+      errorMessage: 'The mail domain is invalid'
+    }
+  },
+  password: signUpSchema.password
+};
+
+exports.validateSignUpSchema = [checkSchema(signUpSchema), schemaValidate];
+exports.validateSignInSchema = [checkSchema(signInSchema), schemaValidate];

@@ -1,6 +1,8 @@
 const logger = require('../logger');
 const userServices = require('../services/users');
-const { notFoundError } = require('../errors');
+const { notFoundError, unauthorizedError } = require('../errors');
+const { objIsEmpty } = require('../mappers/commonObjectsValidations');
+const { generateAccessToken } = require('../helpers/auth');
 
 exports.signUp = async (req, res, next) => {
   try {
@@ -13,6 +15,44 @@ exports.signUp = async (req, res, next) => {
 
     logger.info(`User [${userCreated.name}] has been created succesfully`);
     return res.status(201).send(`User [${userCreated.name}] has been created succesfully`);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.signIn = async (req, res, next) => {
+  try {
+    const { mail, password } = req.body;
+    const user = await userServices.getUserByEmailAndPassword(mail, password);
+
+    if (objIsEmpty(user)) {
+      return next(unauthorizedError('Mail or Password are incorrect'));
+    }
+
+    const token = await generateAccessToken({ uniqueKey: user.id });
+
+    return res.status(200).json({ user, token });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.getUsers = async (req, res, next) => {
+  try {
+    const queryParams = req.query;
+    const offset = queryParams && queryParams.offset ? queryParams.offset : '';
+
+    const options = {
+      limit: queryParams && queryParams.limit ? queryParams.limit : 10
+    };
+
+    if (offset) {
+      options.offset = offset;
+    }
+
+    const users = await userServices.getUsersList();
+
+    return res.status(200).json({ ...users });
   } catch (error) {
     return next(error);
   }
