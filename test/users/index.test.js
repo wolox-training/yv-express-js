@@ -1,25 +1,31 @@
+/* eslint-disable id-length */
 /* eslint max-lines: ["error", {"max": 1000, "skipComments": true}] */
 const supertest = require('supertest');
 
 const app = require('../../app');
 const {
-  mockUserSuccess,
-  mockUserMissingName,
-  mockUserMissingLastName,
-  mockUserMissingMail,
-  mockUserWrongMailDomain,
-  mockUserMissingPassword,
-  mockUserWrongPassword,
-  mockSignInSuccess,
-  mockSignInMissingMail,
-  mockSignInMissingPassword,
-  mockSignInWrongMail,
-  mockSignInWrongPassword,
-  mockListUsersSuccess
+  mockRegularUserSuccess,
+  mockRegularUserMissingName,
+  mockRegularUserMissingLastName,
+  mockRegularUserMissingMail,
+  mockRegularUserWrongMailDomain,
+  mockRegularUserMissingPassword,
+  mockRegularUserWrongPassword,
+  mockRegularUserSignInSuccess,
+  mockRegularUserSignInMissingMail,
+  mockRegularUserSignInMissingPassword,
+  mockRegularUserSignInWrongMail,
+  mockRegularUserSignInWrongPassword,
+  mockListUsersSuccess,
+  mockAdminUserSuccess,
+  mockAdminSignInSuccess,
+  mockAdminUserWrongRol,
+  mockUpdateAdminUserSuccess
 } = require('./_mocks');
 
 const request = supertest(app);
 let userToken = '123';
+let adminUserToken = '123';
 
 const postUserHelperRequest = mockData => request.post('/users').send(mockData);
 const postLoginHelperRequest = mockData => request.post('/users/sessions').send(mockData);
@@ -28,13 +34,18 @@ const getUsersHelperRequest = token =>
     .get('/users')
     .set('Authorization', token)
     .send();
+const postAdminSignUpHelperRequest = mockData =>
+  request
+    .post('/admin/users')
+    .set('Authorization', adminUserToken)
+    .send(mockData);
 
 describe('=== TESTING POST:/users endpoint ===', () => {
   // TO DO => How to validate a type value
   describe('** Succesfull params', () => {
     let response = {};
     beforeAll(async done => {
-      response = await postUserHelperRequest(mockUserSuccess);
+      response = await postUserHelperRequest(mockRegularUserSuccess);
       done();
     });
 
@@ -42,15 +53,15 @@ describe('=== TESTING POST:/users endpoint ===', () => {
       expect(response.statusCode).toBe(201);
     });
 
-    test(`---> The response text must be "User [${mockUserSuccess.name}] has been created succesfully" <---`, () => {
-      expect(response.text).toBe(`User [${mockUserSuccess.name}] has been created succesfully`);
+    test(`---> The response text must be "User [${mockRegularUserSuccess.name}] has been created succesfully" <---`, () => {
+      expect(response.text).toBe(`User [${mockRegularUserSuccess.name}] has been created succesfully`);
     });
   });
 
   describe('** Missing name', () => {
     let response = {};
     beforeAll(async done => {
-      response = await postUserHelperRequest(mockUserMissingName);
+      response = await postUserHelperRequest(mockRegularUserMissingName);
       done();
     });
 
@@ -66,7 +77,7 @@ describe('=== TESTING POST:/users endpoint ===', () => {
   describe('** Missing lastName', () => {
     let response = {};
     beforeAll(async done => {
-      response = await postUserHelperRequest(mockUserMissingLastName);
+      response = await postUserHelperRequest(mockRegularUserMissingLastName);
       done();
     });
 
@@ -82,7 +93,7 @@ describe('=== TESTING POST:/users endpoint ===', () => {
   describe('** Missing mail', () => {
     let response = {};
     beforeAll(async done => {
-      response = await postUserHelperRequest(mockUserMissingMail);
+      response = await postUserHelperRequest(mockRegularUserMissingMail);
       done();
     });
 
@@ -98,8 +109,8 @@ describe('=== TESTING POST:/users endpoint ===', () => {
   describe('** Exist user mail', () => {
     let response = {};
     beforeAll(async done => {
-      await postUserHelperRequest(mockUserSuccess);
-      response = await postUserHelperRequest(mockUserSuccess);
+      await postUserHelperRequest(mockRegularUserSuccess);
+      response = await postUserHelperRequest(mockRegularUserSuccess);
       done();
     });
 
@@ -115,7 +126,7 @@ describe('=== TESTING POST:/users endpoint ===', () => {
   describe('** Wrong mail domain', () => {
     let response = {};
     beforeAll(async done => {
-      response = await postUserHelperRequest(mockUserWrongMailDomain);
+      response = await postUserHelperRequest(mockRegularUserWrongMailDomain);
       done();
     });
 
@@ -131,7 +142,7 @@ describe('=== TESTING POST:/users endpoint ===', () => {
   describe('** Missing password', () => {
     let response = {};
     beforeAll(async done => {
-      response = await postUserHelperRequest(mockUserMissingPassword);
+      response = await postUserHelperRequest(mockRegularUserMissingPassword);
       done();
     });
 
@@ -147,7 +158,7 @@ describe('=== TESTING POST:/users endpoint ===', () => {
   describe('** Wrong password', () => {
     let response = {};
     beforeAll(async done => {
-      response = await postUserHelperRequest(mockUserWrongPassword);
+      response = await postUserHelperRequest(mockRegularUserWrongPassword);
       done();
     });
 
@@ -162,11 +173,11 @@ describe('=== TESTING POST:/users endpoint ===', () => {
 });
 
 describe('=== TESTING POST:/users/sessions endpoint ===', () => {
-  describe('** Succesfull params', () => {
+  describe('** Regular User Succesfull params', () => {
     let response = {};
     beforeAll(async done => {
-      await postUserHelperRequest(mockUserSuccess);
-      response = await postLoginHelperRequest(mockSignInSuccess);
+      await postUserHelperRequest(mockRegularUserSuccess);
+      response = await postLoginHelperRequest(mockRegularUserSignInSuccess);
       userToken = response.body.token ? `Bearer ${response.body.token}` : '';
       done();
     });
@@ -179,8 +190,34 @@ describe('=== TESTING POST:/users/sessions endpoint ===', () => {
       expect(response.body).toHaveProperty('user');
     });
 
-    test(`---> The response user mail must be [${mockSignInSuccess.mail}] <---`, () => {
-      expect(response.body.user.mail).toBe(mockSignInSuccess.mail);
+    test(`---> The response user mail must be [${mockRegularUserSignInSuccess.mail}] <---`, () => {
+      expect(response.body.user.mail).toBe(mockRegularUserSignInSuccess.mail);
+    });
+
+    test('---> The response body should be have "token property" <---', () => {
+      expect(response.body).toHaveProperty('token');
+    });
+  });
+
+  describe('** Admin User Succesfull params', () => {
+    let response = {};
+    beforeAll(async done => {
+      await postUserHelperRequest(mockAdminUserSuccess);
+      response = await postLoginHelperRequest(mockAdminSignInSuccess);
+      adminUserToken = response.body.token ? `Bearer ${response.body.token}` : '';
+      done();
+    });
+
+    test('---> The status code must be "200" <---', () => {
+      expect(response.statusCode).toBe(200);
+    });
+
+    test('---> The response body should be have "user property" <---', () => {
+      expect(response.body).toHaveProperty('user');
+    });
+
+    test(`---> The response user mail must be [${mockAdminSignInSuccess.mail}] <---`, () => {
+      expect(response.body.user.mail).toBe(mockAdminSignInSuccess.mail);
     });
 
     test('---> The response body should be have "token property" <---', () => {
@@ -191,7 +228,7 @@ describe('=== TESTING POST:/users/sessions endpoint ===', () => {
   describe('** Missing mail', () => {
     let response = {};
     beforeAll(async done => {
-      response = await postLoginHelperRequest(mockSignInMissingMail);
+      response = await postLoginHelperRequest(mockRegularUserSignInMissingMail);
       done();
     });
 
@@ -207,7 +244,7 @@ describe('=== TESTING POST:/users/sessions endpoint ===', () => {
   describe('** Wrong mail', () => {
     let response = {};
     beforeAll(async done => {
-      response = await postLoginHelperRequest(mockSignInWrongMail);
+      response = await postLoginHelperRequest(mockRegularUserSignInWrongMail);
       done();
     });
 
@@ -223,7 +260,7 @@ describe('=== TESTING POST:/users/sessions endpoint ===', () => {
   describe('** Missing password', () => {
     let response = {};
     beforeAll(async done => {
-      response = await postLoginHelperRequest(mockSignInMissingPassword);
+      response = await postLoginHelperRequest(mockRegularUserSignInMissingPassword);
       done();
     });
 
@@ -239,7 +276,7 @@ describe('=== TESTING POST:/users/sessions endpoint ===', () => {
   describe('** Wrong password', () => {
     let response = {};
     beforeAll(async done => {
-      response = await postLoginHelperRequest(mockSignInWrongPassword);
+      response = await postLoginHelperRequest(mockRegularUserSignInWrongPassword);
       done();
     });
 
@@ -254,7 +291,7 @@ describe('=== TESTING POST:/users/sessions endpoint ===', () => {
 });
 
 describe('=== TESTING GET:/users endpoint ===', () => {
-  describe('** Succesfull params', () => {
+  describe('**Regular user Succesfull params', () => {
     let response = {};
     beforeAll(async done => {
       for await (const user of mockListUsersSuccess) {
@@ -295,6 +332,156 @@ describe('=== TESTING GET:/users endpoint ===', () => {
     test('---> The response body must be "Unauthorized access" error <---', () => {
       // test internalCode , response.body
       expect(response.body.message).toBe('Unauthorized access');
+    });
+  });
+});
+
+describe('=== TESTING POST:/admin/users endpoint ===', () => {
+  // TO DO => How to validate a type value
+  describe('** Create user Succesfull params', () => {
+    let response = {};
+    beforeAll(async done => {
+      response = await postAdminSignUpHelperRequest(mockAdminUserSuccess);
+      done();
+    });
+
+    test('---> The status code must be "201" <---', () => {
+      expect(response.statusCode).toBe(201);
+    });
+
+    test(`---> The response text must be "User [${mockAdminUserSuccess.name}] has been created succesfully" <---`, () => {
+      expect(response.text).toBe(`User [${mockAdminUserSuccess.name}] has been created succesfully`);
+    });
+  });
+
+  describe('** Update user Succesfull params', () => {
+    let responseUpdate = {};
+    beforeAll(async done => {
+      await postAdminSignUpHelperRequest(mockUpdateAdminUserSuccess);
+      responseUpdate = await postAdminSignUpHelperRequest(mockUpdateAdminUserSuccess);
+      done();
+    });
+
+    test('---> The status (update admin) code must be "202" <---', () => {
+      expect(responseUpdate.statusCode).toBe(202);
+    });
+
+    test(`---> The response (update admin) text must be "User [${mockUpdateAdminUserSuccess.name}] has been updated succesfully" <---`, () => {
+      expect(responseUpdate.text).toBe(
+        `User [${mockUpdateAdminUserSuccess.name}] has been updated succesfully`
+      );
+    });
+  });
+
+  describe('** Missing name', () => {
+    let response = {};
+    beforeAll(async done => {
+      response = await postAdminSignUpHelperRequest(mockRegularUserMissingName);
+      done();
+    });
+
+    test('---> The status code must be "400" <---', () => {
+      expect(response.statusCode).toBe(400);
+    });
+
+    test('---> The response body error must be "Name is required" <---', () => {
+      expect(response.body.errors[0].msg).toBe('Name is required');
+    });
+  });
+
+  describe('** Missing lastName', () => {
+    let response = {};
+    beforeAll(async done => {
+      response = await postAdminSignUpHelperRequest(mockRegularUserMissingLastName);
+      done();
+    });
+
+    test('---> The status code must be "400" <---', () => {
+      expect(response.statusCode).toBe(400);
+    });
+
+    test('---> The response body error must be "Lastname is required" <---', () => {
+      expect(response.body.errors[0].msg).toBe('Lastname is required');
+    });
+  });
+
+  describe('** Missing mail', () => {
+    let response = {};
+    beforeAll(async done => {
+      response = await postAdminSignUpHelperRequest(mockRegularUserMissingMail);
+      done();
+    });
+
+    test('---> The status code must be "400" <---', () => {
+      expect(response.statusCode).toBe(400);
+    });
+
+    test('---> The response body error must be "Mail is required" <---', () => {
+      expect(response.body.errors[0].msg).toBe('Mail is required');
+    });
+  });
+
+  describe('** Wrong mail domain', () => {
+    let response = {};
+    beforeAll(async done => {
+      response = await postAdminSignUpHelperRequest(mockRegularUserWrongMailDomain);
+      done();
+    });
+
+    test('---> The status code must be "400" <---', () => {
+      expect(response.statusCode).toBe(400);
+    });
+
+    test('---> The response body error must be "The mail domain is invalid" <---', () => {
+      expect(response.body.errors[0].msg).toBe('The mail domain is invalid');
+    });
+  });
+
+  describe('** Missing password', () => {
+    let response = {};
+    beforeAll(async done => {
+      response = await postAdminSignUpHelperRequest(mockRegularUserMissingPassword);
+      done();
+    });
+
+    test('---> The status code must be "400" <---', () => {
+      expect(response.statusCode).toBe(400);
+    });
+
+    test('---> The response body error must be "Password is required" <---', () => {
+      expect(response.body.errors[0].msg).toBe('Password is required');
+    });
+  });
+
+  describe('** Wrong password', () => {
+    let response = {};
+    beforeAll(async done => {
+      response = await postAdminSignUpHelperRequest(mockRegularUserWrongPassword);
+      done();
+    });
+
+    test('---> The status code must be "400" <---', () => {
+      expect(response.statusCode).toBe(400);
+    });
+
+    test('---> The response body error must be "Password should be at least 8 chars long" <---', () => {
+      expect(response.body.errors[0].msg).toBe('Password should be at least 8 chars long');
+    });
+  });
+
+  describe('** Wrong user rol', () => {
+    let response = {};
+    beforeAll(async done => {
+      response = await postAdminSignUpHelperRequest(mockAdminUserWrongRol);
+      done();
+    });
+
+    test('---> The status code must be "400" <---', () => {
+      expect(response.statusCode).toBe(400);
+    });
+
+    test('---> The response body error must be "The rol is invalid" <---', () => {
+      expect(response.body.errors[0].msg).toBe('The rol is invalid');
     });
   });
 });

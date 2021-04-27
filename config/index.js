@@ -55,7 +55,8 @@ const config = {
     jwt: {
       jwtSecretKey: 'Th1s1sMyW0l0xS3cr3tJWTK3y!',
       jwtExpiresIn: '1h'
-    }
+    },
+    userRoles: ['Admin', 'Regular']
   }
 };
 

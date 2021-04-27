@@ -45,6 +45,26 @@ exports.getUserByEmailAndPassword = async (mail, newPassword) => {
   }
 };
 
+exports.getUserByAttribute = async condition => {
+  try {
+    const user = await userModel.findOne({ where: { ...condition } });
+
+    return user;
+  } catch (error) {
+    logger.error(`getUserByAttribute Error => ${error}`);
+    return new Error(`getUserByAttribute Error => ${error.message}`);
+  }
+};
+
+exports.getUserById = id => {
+  try {
+    return userModel.findByPk(id);
+  } catch (error) {
+    logger.error(`getUserById Error => ${error}`);
+    return new Error(`getUserById Error => ${error.message}`);
+  }
+};
+
 exports.getUsersList = async (options = {}) => {
   try {
     const returnOptions = {};
@@ -70,5 +90,32 @@ exports.getUsersList = async (options = {}) => {
   } catch (error) {
     logger.error(`getUsersList Error => ${error}`);
     return new Error(`getUsersList Error => ${error.message}`);
+  }
+};
+
+exports.adminSignUp = async data => {
+  try {
+    const mail = data.mail ? data.mail : '';
+    const existMail = await this.existUserMail(mail);
+    let result = '';
+
+    if (existMail) {
+      const user = await this.getUserByAttribute({ mail });
+      result = await user.update(data, { where: { mail } });
+    } else {
+      result = await userModel.create(data);
+    }
+
+    if (!result) {
+      logger.error('adminSignUpUser database error');
+      return databaseError('adminSignUpUser database error');
+    }
+    return {
+      userRegistered: result,
+      isNewUser: !existMail
+    };
+  } catch (error) {
+    logger.error(`adminSignUpUser Error => ${error}`);
+    return new Error(`adminSignUpUser Error => ${error.message}`);
   }
 };

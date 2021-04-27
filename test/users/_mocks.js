@@ -1,15 +1,34 @@
+/* eslint-disable id-length */
 const faker = require('faker');
+const {
+  constants: { userRoles }
+} = require('../../config');
 
-const body = {
+const adminRol = userRoles[0];
+const regularRol = userRoles[1];
+
+const regularBody = {
   name: faker.name.findName(),
   lastName: faker.name.lastName(),
   mail: faker.internet.email(null, null, 'wolox.co'),
-  password: faker.internet.password(8)
+  password: faker.internet.password(8),
+  rol: regularRol
 };
 
 const loginBody = {
-  mail: body.mail,
-  password: body.password
+  mail: regularBody.mail,
+  password: regularBody.password
+};
+
+const adminBody = {
+  ...regularBody,
+  mail: faker.internet.email(null, null, 'wolox.co'),
+  rol: adminRol
+};
+
+const loginAdminBody = {
+  mail: adminBody.mail,
+  password: adminBody.password
 };
 
 const userListBodies = [
@@ -17,81 +36,85 @@ const userListBodies = [
     name: faker.name.findName(),
     lastName: faker.name.lastName(),
     mail: faker.internet.email(null, null, 'wolox.co'),
-    password: faker.internet.password(8)
+    password: faker.internet.password(8),
+    rol: regularRol
   },
   {
     name: faker.name.findName(),
     lastName: faker.name.lastName(),
     mail: faker.internet.email(null, null, 'wolox.co'),
-    password: faker.internet.password(8)
+    password: faker.internet.password(8),
+    rol: regularRol
   },
   {
     name: faker.name.findName(),
     lastName: faker.name.lastName(),
     mail: faker.internet.email(null, null, 'wolox.co'),
-    password: faker.internet.password(8)
+    password: faker.internet.password(8),
+    rol: regularRol
   },
   {
     name: faker.name.findName(),
     lastName: faker.name.lastName(),
     mail: faker.internet.email(null, null, 'wolox.co'),
-    password: faker.internet.password(8)
+    password: faker.internet.password(8),
+    rol: regularRol
   }
 ];
 
-exports.mockUserSuccess = body;
+exports.mockRegularUserSuccess = regularBody;
 
 // Missing params
-exports.mockUserMissingName = {
-  ...body,
+exports.mockRegularUserMissingName = {
+  ...regularBody,
   name: ''
 };
 
-exports.mockUserMissingLastName = {
-  ...body,
+exports.mockRegularUserMissingLastName = {
+  ...regularBody,
   lastName: ''
 };
 
-exports.mockUserMissingMail = {
-  ...body,
+exports.mockRegularUserMissingMail = {
+  ...regularBody,
   mail: ''
 };
 
-exports.mockUserMissingPassword = {
-  ...body,
+exports.mockRegularUserMissingPassword = {
+  ...regularBody,
   password: ''
 };
 
 // Wrong params
-exports.mockUserWrongMailDomain = {
-  ...body,
+exports.mockRegularUserWrongMailDomain = {
+  ...regularBody,
   mail: faker.internet.email(null, null, 'gmail.co')
 };
 
-exports.mockUserWrongPassword = {
-  ...body,
+exports.mockRegularUserWrongPassword = {
+  ...regularBody,
   password: faker.internet.password(7)
 };
 
 // ##### Mocks to users/sessions endpoint
-exports.mockSignInSuccess = loginBody;
+exports.mockRegularUserSignInSuccess = loginBody;
 
-exports.mockSignInMissingMail = {
+exports.mockRegularUserSignInMissingMail = {
   ...loginBody,
   mail: ''
 };
 
-exports.mockSignInMissingPassword = {
+exports.mockRegularUserSignInMissingPassword = {
   ...loginBody,
   password: ''
 };
 
-exports.mockSignInWrongMail = {
+exports.mockRegularUserSignInWrongMail = {
   ...loginBody,
   mail: faker.internet.email(null, null, 'gmail.co')
 };
 
-exports.mockSignInWrongPassword = {
+exports.mockRegularUserSignInWrongPassword = {
   ...loginBody,
   password: faker.internet.password(9)
 };
@@ -99,3 +122,20 @@ exports.mockSignInWrongPassword = {
 // ##### Mocks to GET users endpoint
 
 exports.mockListUsersSuccess = userListBodies;
+
+// ##### Mocks to admin/users endpoint
+
+exports.mockAdminUserSuccess = adminBody;
+
+exports.mockAdminSignInSuccess = loginAdminBody;
+
+exports.mockUpdateAdminUserSuccess = {
+  ...adminBody,
+  mail: regularBody.mail
+};
+
+exports.mockAdminUserWrongRol = {
+  ...adminBody,
+  mail: faker.internet.email(null, null, 'wolox.co'),
+  rol: regularRol
+};

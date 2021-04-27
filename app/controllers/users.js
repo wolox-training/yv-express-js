@@ -57,3 +57,22 @@ exports.getUsers = async (req, res, next) => {
     return next(error);
   }
 };
+
+exports.adminSignUp = async (req, res, next) => {
+  try {
+    const { body } = req;
+    const { userRegistered, isNewUser } = await userServices.adminSignUp(body);
+
+    if (!userRegistered && !userRegistered.id) {
+      return next(notFoundError('User not registered'));
+    }
+
+    const message = `User [${userRegistered.name}] has been ${isNewUser ? 'created' : 'updated'} succesfully`;
+    const statusCode = isNewUser ? 201 : 202;
+
+    logger.info(message);
+    return res.status(statusCode).send(message);
+  } catch (error) {
+    return next(error);
+  }
+};

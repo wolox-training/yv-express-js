@@ -2,13 +2,15 @@ const { checkSchema } = require('express-validator');
 
 const config = require('../../config');
 const { schemaValidate } = require('../middlewares/schemaValidate');
-
-const { regexWoloxDomains } = config.constants;
 const {
   standardBodyValidations,
   validateIfIsEmptyField,
   validateIfExistUserMail
 } = require('../mappers/commonSchemaValidations');
+
+const { regexWoloxDomains, userRoles } = config.constants;
+
+const adminSignUpRolesAllows = userRoles.filter(rol => rol !== userRoles[1]);
 
 const signUpSchema = {
   name: {
@@ -52,5 +54,28 @@ const signInSchema = {
   password: signUpSchema.password
 };
 
+const adminSignUpSchema = {
+  name: signUpSchema.name,
+  lastName: signUpSchema.lastName,
+  password: signUpSchema.password,
+  mail: {
+    ...standardBodyValidations,
+    ...validateIfIsEmptyField('Mail is required'),
+    matches: {
+      options: [regexWoloxDomains],
+      errorMessage: 'The mail domain is invalid'
+    }
+  },
+  rol: {
+    ...standardBodyValidations,
+    ...validateIfIsEmptyField('Rol is required'),
+    isIn: {
+      options: [adminSignUpRolesAllows],
+      errorMessage: 'The rol is invalid'
+    }
+  }
+};
+
 exports.validateSignUpSchema = [checkSchema(signUpSchema), schemaValidate];
 exports.validateSignInSchema = [checkSchema(signInSchema), schemaValidate];
+exports.validateAdminSignUpSchema = [checkSchema(adminSignUpSchema), schemaValidate];
