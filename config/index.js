@@ -51,7 +51,16 @@ const config = {
   },
   constants: {
     regexWoloxDomains: /@wolox(?:\.co|\.ar|\.com)$/,
-    roundsToEncryptHash: 10
+    roundsToEncryptHash: 10,
+    jwt: {
+      jwtSecretKey: 'Th1s1sMyW0l0xS3cr3tJWTK3y!',
+      jwtExpiresIn: '1h'
+    },
+    userRoles: ['Admin', 'Regular']
+  },
+  pagination: {
+    defaultLimit: 10,
+    defaultOffset: 0
   }
 };
 

@@ -14,3 +14,9 @@ exports.httpClientError = message => internalError(message, exports.HTTP_CLIENT_
 
 exports.NOT_FOUND_ERROR = 'not_found_error';
 exports.notFoundError = message => internalError(message, exports.NOT_FOUND_ERROR);
+
+exports.UNAUTHORIZED_ERROR = 'unauthorized_error';
+exports.unauthorizedError = message => internalError(message, exports.UNAUTHORIZED_ERROR);
+
+exports.DECODE_TOKEN_ERROR = 'decode_token_error';
+exports.decodeTokenError = message => internalError(message, exports.DECODE_TOKEN_ERROR);
