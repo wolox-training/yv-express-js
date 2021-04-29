@@ -15,7 +15,7 @@ exports.signUpUser = async data => {
     return result;
   } catch (error) {
     logger.error(`signUpUser Error => ${error}`);
-    return new Error(`signUpUser Error => ${error.message}`);
+    throw databaseError('signUpUser database error');
   }
 };
 
@@ -25,7 +25,7 @@ exports.existUserMail = async mail => {
     return !!result.count;
   } catch (error) {
     logger.error(`signUpUser Error => ${error}`);
-    return new Error(`signUpUser Error => ${error.message}`);
+    throw databaseError('signUpUser database error');
   }
 };
 
@@ -41,18 +41,16 @@ exports.getUserByEmailAndPassword = async (mail, newPassword) => {
     return hasCorrectParameters ? userData : {};
   } catch (error) {
     logger.error(`getUserByEmailAndPassword Error => ${error}`);
-    return new Error(`getUserByEmailAndPassword Error => ${error.message}`);
+    throw databaseError('getUserByEmailAndPassword database error');
   }
 };
 
-exports.getUserByAttribute = async condition => {
+exports.getUserByAttribute = condition => {
   try {
-    const user = await userModel.findOne({ where: { ...condition } });
-
-    return user;
+    return userModel.findOne({ where: { ...condition } });
   } catch (error) {
     logger.error(`getUserByAttribute Error => ${error}`);
-    return new Error(`getUserByAttribute Error => ${error.message}`);
+    throw databaseError('getUserByAttribute database error');
   }
 };
 
@@ -61,35 +59,33 @@ exports.getUserById = id => {
     return userModel.findByPk(id);
   } catch (error) {
     logger.error(`getUserById Error => ${error}`);
-    return new Error(`getUserById Error => ${error.message}`);
+    throw databaseError('getUserById database error');
   }
 };
 
 exports.getUsersList = async (options = {}) => {
   try {
-    const returnOptions = {};
+    const returnOptions = {
+      limit: parseInt(options.limit),
+      offset: parseInt(options.offset)
+    };
     const conditions = {
       ...options,
       attributes: { exclude: ['password'] }
     };
 
-    const users = await userModel.findAll(conditions);
-    const totalUsers = await userModel.count();
-
-    if (options.limit && options.offset) {
-      returnOptions.limit = options.limit;
-      returnOptions.offset = options.offset;
-    }
+    const { rows: users, count } = await userModel.findAndCountAll(conditions);
 
     return {
       users,
       count: users.length,
-      totalUsers,
+      totalUsers: count,
+      totalPages: Math.ceil(count / users.length),
       ...returnOptions
     };
   } catch (error) {
     logger.error(`getUsersList Error => ${error}`);
-    return new Error(`getUsersList Error => ${error.message}`);
+    throw databaseError('getUsersList database error');
   }
 };
 
@@ -116,6 +112,6 @@ exports.adminSignUp = async data => {
     };
   } catch (error) {
     logger.error(`adminSignUpUser Error => ${error}`);
-    return new Error(`adminSignUpUser Error => ${error.message}`);
+    throw databaseError('adminSignUpUser database error');
   }
 };

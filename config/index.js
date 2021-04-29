@@ -57,6 +57,10 @@ const config = {
       jwtExpiresIn: '1h'
     },
     userRoles: ['Admin', 'Regular']
+  },
+  pagination: {
+    defaultLimit: 10,
+    defaultOffset: 0
   }
 };
 

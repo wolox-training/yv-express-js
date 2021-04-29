@@ -17,3 +17,6 @@ exports.notFoundError = message => internalError(message, exports.NOT_FOUND_ERRO
 
 exports.UNAUTHORIZED_ERROR = 'unauthorized_error';
 exports.unauthorizedError = message => internalError(message, exports.UNAUTHORIZED_ERROR);
+
+exports.DECODE_TOKEN_ERROR = 'decode_token_error';
+exports.decodeTokenError = message => internalError(message, exports.DECODE_TOKEN_ERROR);

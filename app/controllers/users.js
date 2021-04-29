@@ -3,6 +3,9 @@ const userServices = require('../services/users');
 const { notFoundError, unauthorizedError } = require('../errors');
 const { objIsEmpty } = require('../mappers/commonObjectsValidations');
 const { generateAccessToken } = require('../helpers/auth');
+const {
+  pagination: { defaultLimit, defaultOffset }
+} = require('../../config');
 
 exports.signUp = async (req, res, next) => {
   try {
@@ -39,18 +42,14 @@ exports.signIn = async (req, res, next) => {
 
 exports.getUsers = async (req, res, next) => {
   try {
-    const queryParams = req.query;
-    const offset = queryParams && queryParams.offset ? queryParams.offset : '';
+    const { limit, offset } = req.query;
 
-    const options = {
-      limit: queryParams && queryParams.limit ? queryParams.limit : 10
+    const pagination = {
+      limit: limit || defaultLimit,
+      offset: offset || defaultOffset
     };
 
-    if (offset) {
-      options.offset = offset;
-    }
-
-    const users = await userServices.getUsersList();
+    const users = await userServices.getUsersList(pagination);
 
     return res.status(200).json({ ...users });
   } catch (error) {

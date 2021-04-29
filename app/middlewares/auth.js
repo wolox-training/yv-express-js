@@ -1,4 +1,4 @@
-const { unauthorizedError } = require('../errors');
+const { unauthorizedError, decodeTokenError } = require('../errors');
 const { verifyToken } = require('../helpers/auth');
 const logger = require('../logger');
 const { objIsNotEmpty } = require('../mappers/commonObjectsValidations');
@@ -14,12 +14,11 @@ exports.validateAccess = async (req, res, next) => {
       return next(unauthorizedError('Unauthorized access'));
     }
 
-    // eslint-disable-next-line require-atomic-updates
-    req.tokenDecoded = tokenDecoded;
+    Object.assign(req, { tokenDecoded });
     return next();
   } catch (error) {
     logger.error(`validateAccess Error => ${error}`);
-    return new Error(`validateAccess Error => ${error.message}`);
+    return next(decodeTokenError('An error was occurred when try to decode token'));
   }
 };
 
